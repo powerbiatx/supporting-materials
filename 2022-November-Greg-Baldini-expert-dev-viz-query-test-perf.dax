@@ -1,0 +1,21 @@
+﻿DEFINE
+    MEASURE 'FactSales'[End] =
+        MAX ( 'FactSales'[DateTime] )
+    MEASURE 'FactSales'[Duration Days] =
+        INT ( [End] - [Start] ) + 1
+    MEASURE 'FactSales'[New per day] =
+        DIVIDE ( [Sales], [Duration Days] )
+  VAR __DS0Core = 
+    SUMMARIZECOLUMNS(
+      ROLLUPADDISSUBTOTAL('DimCustomer'[Customer], "IsGrandTotalRowTotal"),
+      "Sales_per_day", 'FactSales'[new per day]
+    )
+
+  VAR __DS0PrimaryWindowed = 
+    TOPN(502, __DS0Core, [IsGrandTotalRowTotal], 0, 'DimCustomer'[Customer], 1)
+
+EVALUATE
+  __DS0PrimaryWindowed
+
+ORDER BY
+  [IsGrandTotalRowTotal] DESC, 'DimCustomer'[Customer]

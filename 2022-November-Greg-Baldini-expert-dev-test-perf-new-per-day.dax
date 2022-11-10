@@ -1,0 +1,15 @@
+﻿DEFINE
+    MEASURE 'FactSales'[End] =
+        MAX ( 'FactSales'[DateTime] )
+    MEASURE 'FactSales'[Duration Days] =
+        INT ( [End] - [Start] ) + 1
+    MEASURE 'FactSales'[New per day] =
+        DIVIDE ( [Sales], [Duration Days] )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    DimCustomer[Customer]
+    ,"Sales per day", [Sales per day]
+    //,"new per day", [New per day]
+)
+ORDER BY DimCustomer[Customer] ASC
